@@ -30,8 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Observer
 import androidx.work.ArrayCreatingInputMerger
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
@@ -41,6 +43,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OverwritingInputMerger
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import androidx.work.Worker
@@ -285,7 +288,9 @@ class MainActivity : ComponentActivity() {
                                         .build()
 
                                     //MyWorker,DownloadWorker,FinishWorker
-                                    val operation = workManager.beginWith(listOf(request1, request2)).then(request3).enqueue()
+                                    val operation =
+                                        workManager.beginWith(listOf(request1, request2))
+                                            .then(request3).enqueue()
                                     Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
                                     Log.d("MainActivity", "병렬 작업 실행 operation result = ${operation.result.get()}")
                                 }
@@ -318,7 +323,9 @@ class MainActivity : ComponentActivity() {
                                         .build()
 
                                     //MyWorker,DownloadWorker,FinishWorker
-                                    val operation = workManager.beginWith(listOf(request1, request2)).then(request3).enqueue()
+                                    val operation =
+                                        workManager.beginWith(listOf(request1, request2))
+                                            .then(request3).enqueue()
                                     Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
                                     Log.d("MainActivity", "병렬 작업 실행 operation result = ${operation.result.get()}")
                                 }
@@ -351,9 +358,36 @@ class MainActivity : ComponentActivity() {
                                         .build()
 
                                     //MyWorker,DownloadWorker,FinishWorker
-                                    val operation = workManager.beginWith(request2).then(request1).then(request3).enqueue()
+                                    val operation = workManager.beginWith(request2).then(request1)
+                                        .then(request3).enqueue()
                                     Log.d("MainActivity", "Dependent work 실행 operation = $operation")
                                     Log.d("MainActivity", "Dependent work 실행 operation result = ${operation.await()}")
+                                }
+                            }
+                        )
+
+                        TitleAndButton(
+                            title = "중간 worker 진행률 관찰 테스트",
+                            titleModifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
+                            buttonName = "DownloadWorker 관찰 작업 실행",
+                            buttonModifier = Modifier.wrapContentSize(),
+                            clickEvent = {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    WorkManager.getInstance(applicationContext)
+                                        // requestId is the WorkRequest id
+                                        .getWorkInfosForUniqueWorkLiveData("DownloadWorker")
+                                        .observe(
+                                            this@MainActivity
+                                        ) { workInfos: List<WorkInfo> ->
+                                            for (workInfo in workInfos) {
+                                                val progress = workInfo.progress
+                                                val value = progress.getInt("progress", 0)
+                                                Log.d("MainActivity", "progress workInfo = $workInfo, value = $value")
+                                            }
+                                        }
                                 }
                             }
                         )
@@ -381,7 +415,7 @@ class MainActivity : ComponentActivity() {
             val isSuccess = inputData.getBoolean("isSuccess", true)
             Log.d("MyWorker", "doWork() isSuccess = $isSuccess")
             Thread.sleep(10000)
-            return if(isSuccess) Result.success(workDataOf("work" to "MyWorker1")) else Result.failure()
+            return if (isSuccess) Result.success(workDataOf("work" to "MyWorker1")) else Result.failure()
         }
 
         override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
@@ -407,7 +441,7 @@ class MainActivity : ComponentActivity() {
             val isSuccess = inputData.getBoolean("isSuccess", true)
             Log.d("MyWorker", "doWork() isSuccess = $isSuccess")
             Thread.sleep(10000)
-            return if(isSuccess) Result.success(workDataOf("work" to "MyWorker2")) else Result.failure()
+            return if (isSuccess) Result.success(workDataOf("work" to "MyWorker2")) else Result.failure()
         }
 
         override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
@@ -441,7 +475,7 @@ class MainActivity : ComponentActivity() {
             }
             Log.d("FinishWorker", "doWork() isSuccess = $isSuccess")
             Thread.sleep(1000)
-            return if(isSuccess) Result.success(workDataOf("work" to "FinishWorker")) else Result.failure()
+            return if (isSuccess) Result.success(workDataOf("work" to "FinishWorker")) else Result.failure()
         }
 
         override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
@@ -466,34 +500,44 @@ class MainActivity : ComponentActivity() {
         override suspend fun doWork(): Result {
             val isSuccess = inputData.getBoolean("isSuccess", true)
             val isRetry = inputData.getBoolean("isRetry", false)
-
             val delay = 200L
             Log.d("DownloadWorker", "doWork() isSuccess = $isSuccess")
             setForeground(createForegroundInfo("0%"))
+            setProgress(workDataOf("progress" to 0))
             delay(delay)
             setForeground(createForegroundInfo("10%"))
+            setProgress(workDataOf("progress" to 10))
             delay(delay)
             setForeground(createForegroundInfo("20%"))
+            setProgress(workDataOf("progress" to 20))
             delay(delay)
             setForeground(createForegroundInfo("30%"))
+            setProgress(workDataOf("progress" to 30))
             delay(delay)
             setForeground(createForegroundInfo("40%"))
+            setProgress(workDataOf("progress" to 40))
             delay(delay)
             setForeground(createForegroundInfo("50%"))
+            setProgress(workDataOf("progress" to 50))
             delay(delay)
             if (!isSuccess)
                 return Result.failure(workDataOf("progress" to "download 60% failure!"))
             setForeground(createForegroundInfo("60%"))
+            setProgress(workDataOf("progress" to 60))
             delay(delay)
             setForeground(createForegroundInfo("70%"))
+            setProgress(workDataOf("progress" to 70))
             delay(delay)
             setForeground(createForegroundInfo("80%"))
+            setProgress(workDataOf("progress" to 80))
             delay(delay)
             setForeground(createForegroundInfo("90%"))
+            setProgress(workDataOf("progress" to 90))
             delay(delay)
             if (isRetry)
                 return Result.retry()
             setForeground(createForegroundInfo("100%"))
+            setProgress(workDataOf("progress" to 100))
             delay(delay)
             return Result.success(workDataOf("success" to 100))
         }
