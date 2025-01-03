@@ -43,6 +43,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OverwritingInputMerger
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
@@ -292,7 +293,10 @@ class MainActivity : ComponentActivity() {
                                         workManager.beginWith(listOf(request1, request2))
                                             .then(request3).enqueue()
                                     Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
-                                    Log.d("MainActivity", "병렬 작업 실행 operation result = ${operation.result.get()}")
+                                    Log.d(
+                                        "MainActivity",
+                                        "병렬 작업 실행 operation result = ${operation.result.get()}"
+                                    )
                                 }
                             }
                         )
@@ -327,7 +331,10 @@ class MainActivity : ComponentActivity() {
                                         workManager.beginWith(listOf(request1, request2))
                                             .then(request3).enqueue()
                                     Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
-                                    Log.d("MainActivity", "병렬 작업 실행 operation result = ${operation.result.get()}")
+                                    Log.d(
+                                        "MainActivity",
+                                        "병렬 작업 실행 operation result = ${operation.result.get()}"
+                                    )
                                 }
                             }
                         )
@@ -360,8 +367,14 @@ class MainActivity : ComponentActivity() {
                                     //MyWorker,DownloadWorker,FinishWorker
                                     val operation = workManager.beginWith(request2).then(request1)
                                         .then(request3).enqueue()
-                                    Log.d("MainActivity", "Dependent work 실행 operation = $operation")
-                                    Log.d("MainActivity", "Dependent work 실행 operation result = ${operation.await()}")
+                                    Log.d(
+                                        "MainActivity",
+                                        "Dependent work 실행 operation = $operation"
+                                    )
+                                    Log.d(
+                                        "MainActivity",
+                                        "Dependent work 실행 operation result = ${operation.await()}"
+                                    )
                                 }
                             }
                         )
@@ -385,9 +398,32 @@ class MainActivity : ComponentActivity() {
                                             for (workInfo in workInfos) {
                                                 val progress = workInfo.progress
                                                 val value = progress.getInt("progress", 0)
-                                                Log.d("MainActivity", "progress workInfo = $workInfo, value = $value")
+                                                Log.d(
+                                                    "MainActivity",
+                                                    "progress workInfo = $workInfo, value = $value"
+                                                )
                                             }
                                         }
+                                }
+                            }
+                        )
+
+                        TitleAndButton(
+                            title = "주기적 작업 예약 테스트",
+                            titleModifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
+                            buttonName = "작업 실행",
+                            buttonModifier = Modifier.wrapContentSize(),
+                            clickEvent = {
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    val request = PeriodicWorkRequestBuilder<MyWorker1>(
+                                        repeatInterval = 15,
+                                        repeatIntervalTimeUnit = TimeUnit.MINUTES
+                                    ).addTag("MyWorker1").build()
+
+                                    workManager.enqueue(request)
                                 }
                             }
                         )
