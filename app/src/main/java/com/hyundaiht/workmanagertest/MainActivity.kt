@@ -408,6 +408,20 @@ class MainActivity : ComponentActivity() {
                             }
                         )
 
+                        /**
+                         * 테스트 결과
+                         * - 앱이 켜져있을때
+                         * 2025-01-03 10:35:00.909 30527-5212  MyWorker                com.hyundaiht.workmanagertest        D  doWork() isSuccess = true
+                         * 2025-01-03 10:35:10.954 30527-32027 WM-WorkerWrapper        com.hyundaiht.workmanagertest        I  Worker result SUCCESS for Work [ id=fbc66d88-5fc9-4513-8f64-c73b24b3d3c6, tags={ com.hyundaiht.workmanagertest.MainActivity$MyWorker1, MyWorker1 } ]
+                         * 2025-01-03 10:50:11.045 30527-6244  MyWorker                com.hyundaiht.workmanagertest        D  doWork() isSuccess = true
+                         * 2025-01-03 10:50:21.071 30527-32073 WM-WorkerWrapper        com.hyundaiht.workmanagertest        I  Worker result SUCCESS for Work [ id=fbc66d88-5fc9-4513-8f64-c73b24b3d3c6, tags={ com.hyundaiht.workmanagertest.MainActivity$MyWorker1, MyWorker1 } ]
+                         *
+                         * - 앱이 꺼져있을때
+                         * 2025-01-03 11:05:22.218  9140-9179  MyWorker                com.hyundaiht.workmanagertest        D  doWork() isSuccess = true
+                         * 2025-01-03 11:05:32.277  9140-9176  WM-WorkerWrapper        com.hyundaiht.workmanagertest        I  Worker result SUCCESS for Work [ id=fbc66d88-5fc9-4513-8f64-c73b24b3d3c6, tags={ com.hyundaiht.workmanagertest.MainActivity$MyWorker1, MyWorker1 } ]
+                         * 2025-01-03 11:20:32.419  9140-9849  MyWorker                com.hyundaiht.workmanagertest        D  doWork() isSuccess = true
+                         * 2025-01-03 11:20:42.446  9140-9178  WM-WorkerWrapper        com.hyundaiht.workmanagertest        I  Worker result SUCCESS for Work [ id=fbc66d88-5fc9-4513-8f64-c73b24b3d3c6, tags={ com.hyundaiht.workmanagertest.MainActivity$MyWorker1, MyWorker1 } ]
+                         */
                         TitleAndButton(
                             title = "주기적 작업 예약 테스트",
                             titleModifier = Modifier
