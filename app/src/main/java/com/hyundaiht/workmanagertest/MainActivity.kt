@@ -30,21 +30,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
+import androidx.work.ArrayCreatingInputMerger
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OverwritingInputMerger
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.await
 import androidx.work.workDataOf
 import com.google.common.util.concurrent.ListenableFuture
 import com.hyundaiht.workmanagertest.ui.theme.WorkManagerTestTheme
@@ -75,13 +76,14 @@ class MainActivity : ComponentActivity() {
                             title = "enqueueUniqueWork 작업 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "즉시 테스트 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
                                     val request =
-                                        OneTimeWorkRequestBuilder<MyWorker>()
+                                        OneTimeWorkRequestBuilder<MyWorker1>()
                                             .build()
 
                                     workManager.enqueueUniqueWork(
@@ -98,7 +100,8 @@ class MainActivity : ComponentActivity() {
                             title = "enqueueUniqueWork 작업 정보 확인",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "작업 정보 조회 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = { query ->
@@ -118,7 +121,8 @@ class MainActivity : ComponentActivity() {
                             title = "작업 삭제 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "작업 삭제 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
@@ -130,7 +134,8 @@ class MainActivity : ComponentActivity() {
                             title = "DownloadWorker 작업 중지 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "작업 중지 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
@@ -142,7 +147,8 @@ class MainActivity : ComponentActivity() {
                             title = "지속적인 작업 - 장기 실행",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "다운로드 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
@@ -166,7 +172,8 @@ class MainActivity : ComponentActivity() {
                             title = "작업 제약 조건 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "다운로드 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
@@ -197,7 +204,8 @@ class MainActivity : ComponentActivity() {
                             title = "재시도 및 백오프 정책 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "다운로드 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
@@ -227,7 +235,8 @@ class MainActivity : ComponentActivity() {
                             title = "복잡한 작업 쿼리 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "작업 정보 조회 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = { query ->
@@ -250,26 +259,69 @@ class MainActivity : ComponentActivity() {
                         )
 
                         TitleAndButton(
-                            title = "작업 체이닝 테스트 - 병렬 작업 실행",
+                            title = "작업 체이닝 테스트 - ArrayCreatingInputMerger 병렬 작업 실행",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "작업 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
-                                val request1 = OneTimeWorkRequestBuilder<MyWorker>()
-                                    .addTag("MyWorker")
-                                    .setInputMerger(OverwritingInputMerger::class.java)
-                                    .build()
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    val request1 = OneTimeWorkRequestBuilder<MyWorker1>()
+                                        .addTag("MyWorker1")
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .build()
 
-                                val request2 = OneTimeWorkRequestBuilder<DownloadWorker>()
-                                    .addTag("DownloadWorker")
-                                    .setInputMerger(OverwritingInputMerger::class.java)
-                                    .build()
+                                    val request2 = OneTimeWorkRequestBuilder<MyWorker2>()
+                                        .addTag("MyWorker2")
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .build()
 
-                                val operation = workManager.beginWith(listOf(request1, request2)).enqueue()
-                                Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
-                                Log.d("MainActivity", "병렬 작업 실행 operation result = ${operation.result.get()}")
+                                    val request3 = OneTimeWorkRequestBuilder<FinishWorker>()
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .setInputMerger(ArrayCreatingInputMerger::class.java)
+                                        .addTag("FinishWorker")
+                                        .build()
+
+                                    //MyWorker,DownloadWorker,FinishWorker
+                                    val operation = workManager.beginWith(listOf(request1, request2)).then(request3).enqueue()
+                                    Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
+                                    Log.d("MainActivity", "병렬 작업 실행 operation result = ${operation.result.get()}")
+                                }
+                            }
+                        )
+                        TitleAndButton(
+                            title = "작업 체이닝 테스트 - OverwritingInputMerger 병렬 작업 실행",
+                            titleModifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
+                            buttonName = "작업 실행",
+                            buttonModifier = Modifier.wrapContentSize(),
+                            clickEvent = {
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    val request1 = OneTimeWorkRequestBuilder<MyWorker1>()
+                                        .addTag("MyWorker1")
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .build()
+
+                                    val request2 = OneTimeWorkRequestBuilder<MyWorker2>()
+                                        .addTag("MyWorker2")
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .build()
+
+                                    val request3 = OneTimeWorkRequestBuilder<FinishWorker>()
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .setInputMerger(OverwritingInputMerger::class.java)
+                                        .addTag("FinishWorker")
+                                        .build()
+
+                                    //MyWorker,DownloadWorker,FinishWorker
+                                    val operation = workManager.beginWith(listOf(request1, request2)).then(request3).enqueue()
+                                    Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
+                                    Log.d("MainActivity", "병렬 작업 실행 operation result = ${operation.result.get()}")
+                                }
                             }
                         )
 
@@ -277,29 +329,32 @@ class MainActivity : ComponentActivity() {
                             title = "작업 체이닝 테스트 - Dependent work 실행",
                             titleModifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight(),
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
                             buttonName = "작업 실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
-                                val request1 = OneTimeWorkRequestBuilder<MyWorker>()
-                                    .setInputData(workDataOf("isSuccess" to true))
-                                    .addTag("MyWorker")
-                                    .build()
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    val request1 = OneTimeWorkRequestBuilder<MyWorker1>()
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .addTag("MyWorker")
+                                        .build()
 
-                                val request2 = OneTimeWorkRequestBuilder<DownloadWorker>()
-                                    .setInputData(workDataOf("isSuccess" to true))
-                                    .addTag("DownloadWorker")
-                                    .build()
+                                    val request2 = OneTimeWorkRequestBuilder<DownloadWorker>()
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .addTag("DownloadWorker")
+                                        .build()
 
-                                val request3 = OneTimeWorkRequestBuilder<FinishWorker>()
-                                    .setInputData(workDataOf("isSuccess" to true))
-                                    .addTag("FinishWorker")
-                                    .build()
+                                    val request3 = OneTimeWorkRequestBuilder<FinishWorker>()
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .addTag("FinishWorker")
+                                        .build()
 
-                                //MyWorker,DownloadWorker,FinishWorker
-                                val operation = workManager.beginWith(request2).then(request1).then(request3).enqueue()
-                                Log.d("MainActivity", "Dependent work 실행 operation = $operation")
-                                Log.d("MainActivity", "Dependent work 실행 operation result = ${operation.result.get()}")
+                                    //MyWorker,DownloadWorker,FinishWorker
+                                    val operation = workManager.beginWith(request2).then(request1).then(request3).enqueue()
+                                    Log.d("MainActivity", "Dependent work 실행 operation = $operation")
+                                    Log.d("MainActivity", "Dependent work 실행 operation result = ${operation.await()}")
+                                }
                             }
                         )
                     }
@@ -318,15 +373,15 @@ class MainActivity : ComponentActivity() {
      * @param appContext
      * @param workerParams
      */
-    class MyWorker(
+    class MyWorker1(
         appContext: Context,
         workerParams: WorkerParameters
     ) : Worker(appContext, workerParams) {
         override fun doWork(): Result {
             val isSuccess = inputData.getBoolean("isSuccess", true)
             Log.d("MyWorker", "doWork() isSuccess = $isSuccess")
-            Thread.sleep(1000)
-            return if(isSuccess) Result.success(workDataOf("work" to "MyWorker")) else Result.failure()
+            Thread.sleep(10000)
+            return if(isSuccess) Result.success(workDataOf("work" to "MyWorker1")) else Result.failure()
         }
 
         override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
@@ -344,12 +399,46 @@ class MainActivity : ComponentActivity() {
      * @param appContext
      * @param workerParams
      */
+    class MyWorker2(
+        appContext: Context,
+        workerParams: WorkerParameters
+    ) : Worker(appContext, workerParams) {
+        override fun doWork(): Result {
+            val isSuccess = inputData.getBoolean("isSuccess", true)
+            Log.d("MyWorker", "doWork() isSuccess = $isSuccess")
+            Thread.sleep(10000)
+            return if(isSuccess) Result.success(workDataOf("work" to "MyWorker2")) else Result.failure()
+        }
+
+        override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
+            return super.getForegroundInfoAsync()
+        }
+    }
+
+    /**
+     * FinishWorker
+     *
+     * @constructor
+     * - appContext
+     * - workerParams
+     *
+     * @param appContext
+     * @param workerParams
+     */
     class FinishWorker(
         appContext: Context,
         workerParams: WorkerParameters
     ) : Worker(appContext, workerParams) {
         override fun doWork(): Result {
             val isSuccess = inputData.getBoolean("isSuccess", true)
+            val mergedData = inputData.keyValueMap
+            val workStringArray = inputData.getStringArray("work").contentToString()
+            val workString = inputData.getString("work")
+            Log.d("FinishWorker", "workString: $workString, workStringArray: $workStringArray")
+
+            mergedData.forEach { (key, value) ->
+                Log.d("FinishWorker", "Key: $key, Value: $value")
+            }
             Log.d("FinishWorker", "doWork() isSuccess = $isSuccess")
             Thread.sleep(1000)
             return if(isSuccess) Result.success(workDataOf("work" to "FinishWorker")) else Result.failure()
