@@ -167,6 +167,40 @@ class WorkOptionActivity : ComponentActivity() {
                             })
 
                         TitleAndButton(
+                            title = "작업 제약 조건 테스트",
+                            titleModifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
+                            buttonName = "다운로드 실행",
+                            buttonModifier = Modifier.wrapContentSize(),
+                            clickEvent = {
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    //사용자의 기기가 충전 중이고 Wi-Fi에 연결되어 있을 때만 실행
+                                    val isSuccess = true
+                                    val constraints = Constraints.Builder()
+                                        .setRequiredNetworkType(NetworkType.UNMETERED)
+                                        .setRequiresCharging(true)
+//                                        .setRequiresDeviceIdle()    //WorkRequest를 실행하기 위해 장치가 유휴 상태여야 하는지 여부를 설정합니다. 기본값은 false입니다.
+//                                        .setRequiresStorageNotLow() //WorkRequest를 실행하기 위해 장치의 사용 가능한 저장소가 허용 가능한 수준이어야 하는지 여부를 설정합니다. 기본값은 false입니다.
+                                        .build()
+
+                                    Log.d("MainActivity", "DownloadWorker isSuccess = $isSuccess")
+                                    val request = OneTimeWorkRequestBuilder<DownloadWorker>()
+                                        .setInputData(workDataOf("isSuccess" to isSuccess))
+                                        .setConstraints(constraints)
+                                        .build()
+
+                                    workManager.enqueueUniqueWork(
+                                        "DownloadWorker",
+                                        ExistingWorkPolicy.KEEP,
+                                        request
+                                    )
+                                }
+                            }
+                        )
+
+                        TitleAndButton(
                             title = "재시도 및 백오프 정책 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
