@@ -1,10 +1,6 @@
 package com.hyundaiht.workmanagertest
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.ServiceInfo
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -30,14 +26,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Observer
 import androidx.work.ArrayCreatingInputMerger
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
-import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
@@ -52,10 +44,13 @@ import androidx.work.WorkerParameters
 import androidx.work.await
 import androidx.work.workDataOf
 import com.google.common.util.concurrent.ListenableFuture
+import com.hyundaiht.workmanagertest.work.DownloadWorker
 import com.hyundaiht.workmanagertest.ui.theme.WorkManagerTestTheme
+import com.hyundaiht.workmanagertest.work.FinishWorker
+import com.hyundaiht.workmanagertest.work.MyWorker1
+import com.hyundaiht.workmanagertest.work.MyWorker2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -446,191 +441,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    /**
-     * MyWorker
-     *
-     * @constructor
-     * - appContext
-     * - workerParams
-     *
-     * @param appContext
-     * @param workerParams
-     */
-    class MyWorker1(
-        appContext: Context,
-        workerParams: WorkerParameters
-    ) : Worker(appContext, workerParams) {
-        override fun doWork(): Result {
-            val isSuccess = inputData.getBoolean("isSuccess", true)
-            Log.d("MyWorker", "doWork() isSuccess = $isSuccess")
-            Thread.sleep(10000)
-            return if (isSuccess) Result.success(workDataOf("work" to "MyWorker1")) else Result.failure()
-        }
-
-        override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
-            return super.getForegroundInfoAsync()
-        }
-    }
-
-    /**
-     * MyWorker
-     *
-     * @constructor
-     * - appContext
-     * - workerParams
-     *
-     * @param appContext
-     * @param workerParams
-     */
-    class MyWorker2(
-        appContext: Context,
-        workerParams: WorkerParameters
-    ) : Worker(appContext, workerParams) {
-        override fun doWork(): Result {
-            val isSuccess = inputData.getBoolean("isSuccess", true)
-            Log.d("MyWorker", "doWork() isSuccess = $isSuccess")
-            Thread.sleep(10000)
-            return if (isSuccess) Result.success(workDataOf("work" to "MyWorker2")) else Result.failure()
-        }
-
-        override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
-            return super.getForegroundInfoAsync()
-        }
-    }
-
-    /**
-     * FinishWorker
-     *
-     * @constructor
-     * - appContext
-     * - workerParams
-     *
-     * @param appContext
-     * @param workerParams
-     */
-    class FinishWorker(
-        appContext: Context,
-        workerParams: WorkerParameters
-    ) : Worker(appContext, workerParams) {
-        override fun doWork(): Result {
-            val isSuccess = inputData.getBoolean("isSuccess", true)
-            val mergedData = inputData.keyValueMap
-            val workStringArray = inputData.getStringArray("work").contentToString()
-            val workString = inputData.getString("work")
-            Log.d("FinishWorker", "workString: $workString, workStringArray: $workStringArray")
-
-            mergedData.forEach { (key, value) ->
-                Log.d("FinishWorker", "Key: $key, Value: $value")
-            }
-            Log.d("FinishWorker", "doWork() isSuccess = $isSuccess")
-            Thread.sleep(1000)
-            return if (isSuccess) Result.success(workDataOf("work" to "FinishWorker")) else Result.failure()
-        }
-
-        override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
-            return super.getForegroundInfoAsync()
-        }
-    }
-
-    /**
-     * DownloadWorker
-     *
-     * @constructor
-     * - appContext
-     * - workerParams
-     *
-     * @param appContext
-     * @param workerParams
-     */
-    class DownloadWorker(
-        appContext: Context,
-        workerParams: WorkerParameters
-    ) : CoroutineWorker(appContext, workerParams) {
-        override suspend fun doWork(): Result {
-            val isSuccess = inputData.getBoolean("isSuccess", true)
-            val isRetry = inputData.getBoolean("isRetry", false)
-            val delay = 200L
-            Log.d("DownloadWorker", "doWork() isSuccess = $isSuccess")
-            setForeground(createForegroundInfo("0%"))
-            setProgress(workDataOf("progress" to 0))
-            delay(delay)
-            setForeground(createForegroundInfo("10%"))
-            setProgress(workDataOf("progress" to 10))
-            delay(delay)
-            setForeground(createForegroundInfo("20%"))
-            setProgress(workDataOf("progress" to 20))
-            delay(delay)
-            setForeground(createForegroundInfo("30%"))
-            setProgress(workDataOf("progress" to 30))
-            delay(delay)
-            setForeground(createForegroundInfo("40%"))
-            setProgress(workDataOf("progress" to 40))
-            delay(delay)
-            setForeground(createForegroundInfo("50%"))
-            setProgress(workDataOf("progress" to 50))
-            delay(delay)
-            if (!isSuccess)
-                return Result.failure(workDataOf("progress" to "download 60% failure!"))
-            setForeground(createForegroundInfo("60%"))
-            setProgress(workDataOf("progress" to 60))
-            delay(delay)
-            setForeground(createForegroundInfo("70%"))
-            setProgress(workDataOf("progress" to 70))
-            delay(delay)
-            setForeground(createForegroundInfo("80%"))
-            setProgress(workDataOf("progress" to 80))
-            delay(delay)
-            setForeground(createForegroundInfo("90%"))
-            setProgress(workDataOf("progress" to 90))
-            delay(delay)
-            if (isRetry)
-                return Result.retry()
-            setForeground(createForegroundInfo("100%"))
-            setProgress(workDataOf("progress" to 100))
-            delay(delay)
-            return Result.success(workDataOf("success" to 100))
-        }
-
-        override suspend fun getForegroundInfo(): ForegroundInfo {
-            return createForegroundInfo("0")
-        }
-
-        private fun createForegroundInfo(progress: String): ForegroundInfo {
-            val title = "TEST"
-
-            // Create a Notification channel if necessary
-            val channelId = "work_channel" // 채널 ID
-            val channelName = "WorkManager Notifications" // 채널 이름
-            val channelDescription = "Notifications for WorkManager tasks" // 채널 설명
-            val importance = NotificationManager.IMPORTANCE_LOW // 알림 중요도
-
-            // 채널 생성
-            val channel = NotificationChannel(channelId, channelName, importance).apply {
-                description = channelDescription
-            }
-
-            // NotificationManager를 통해 채널 등록
-            val notificationManager =
-                applicationContext.getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(channel)
-
-            val notification = NotificationCompat.Builder(applicationContext, "work_channel")
-                .setContentTitle(title)
-                .setContentText(progress)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setOngoing(true)
-                .build()
-
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ForegroundInfo(0, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            } else {
-                ForegroundInfo(0, notification)
-            }
-        }
-
-    }
-
 }
 
 @Composable

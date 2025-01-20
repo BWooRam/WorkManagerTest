@@ -20,6 +20,40 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.WorkManagerTest">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+
+        <activity
+            android:name=".OneTimeWorkPauseAndCancelActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WorkManagerTest">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+
+
+        <activity
+            android:name=".OneTimeWorkRegisterActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WorkManagerTest">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+
+        <activity
+            android:name=".PeriodicWorkRegisterAndCancelActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WorkManagerTest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
