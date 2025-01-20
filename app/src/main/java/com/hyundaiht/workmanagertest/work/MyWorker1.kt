@@ -26,8 +26,9 @@ class MyWorker1(
 
     override fun doWork(): Result {
         val isSuccess = inputData.getBoolean("isSuccess", true)
+        val id = inputData.getInt("id", 0)
         val delayValue = inputData.getLong("delay", 10000)
-        Log.d(tag, "doWork() delayValue = $delayValue, isSuccess = $isSuccess")
+        Log.d(tag, "doWork() id = $id, delayValue = $delayValue, isSuccess = $isSuccess")
         Thread.sleep(delayValue)
         return if (isSuccess) Result.success(workDataOf("work" to "MyWorker1")) else Result.failure()
     }
