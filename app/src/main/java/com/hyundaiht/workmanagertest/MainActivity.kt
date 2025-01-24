@@ -1,6 +1,5 @@
 package com.hyundaiht.workmanagertest
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -27,37 +26,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.work.ArrayCreatingInputMerger
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.ForegroundInfo
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OverwritingInputMerger
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.WorkQuery
-import androidx.work.Worker
-import androidx.work.WorkerParameters
-import androidx.work.await
-import androidx.work.workDataOf
-import com.google.common.util.concurrent.ListenableFuture
-import com.hyundaiht.workmanagertest.work.DownloadWorker
 import com.hyundaiht.workmanagertest.ui.theme.WorkManagerTestTheme
-import com.hyundaiht.workmanagertest.work.FinishWorker
-import com.hyundaiht.workmanagertest.work.MyWorker1
-import com.hyundaiht.workmanagertest.work.MyWorker2
+import com.hyundaiht.workmanagertest.work.HiltWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
+    private val tag = javaClass.simpleName
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val workManager = WorkManager
+            .getInstance(this@MainActivity)
         setContent {
             WorkManagerTestTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -68,8 +52,24 @@ class MainActivity : ComponentActivity() {
                             .verticalScroll(rememberScrollState())
                             .padding(innerPadding)
                     ) {
+                        TitleAndButton(title = "HiltWorker 작업 예약 테스트",
+                            titleModifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .padding(top = 10.dp),
+                            buttonName = "실행",
+                            buttonModifier = Modifier.wrapContentSize(),
+                            clickEvent = {
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    val request = OneTimeWorkRequestBuilder<HiltWorker>()
+                                            .addTag("HiltWorkerTest")
+                                            .build()
 
-                        
+                                    val operation = workManager.enqueue(request)
+                                    Log.d(tag, "enqueue operation = ${operation.result.get()}")
+                                }
+                            })
+
                     }
                 }
             }
