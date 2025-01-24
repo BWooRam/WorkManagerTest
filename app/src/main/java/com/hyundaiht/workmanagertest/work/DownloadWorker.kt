@@ -24,7 +24,7 @@ import kotlinx.coroutines.delay
  * @param appContext
  * @param workerParams
  */
-class DownloadWorker(
+open class DownloadWorker(
     appContext: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
