@@ -63,7 +63,7 @@ class LongTimeWorkAndChainingActivity : ComponentActivity() {
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
                                     val isSuccess = true
-                                    Log.d("MainActivity", "DownloadWorker isSuccess = $isSuccess")
+                                    Log.d(tag, "DownloadWorker isSuccess = $isSuccess")
                                     val request = OneTimeWorkRequestBuilder<DownloadWorker>()
                                         .setInputData(workDataOf("isSuccess" to isSuccess))
                                         .build()
@@ -107,11 +107,8 @@ class LongTimeWorkAndChainingActivity : ComponentActivity() {
                                     val operation =
                                         workManager.beginWith(listOf(request1, request2))
                                             .then(request3).enqueue()
-                                    Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
-                                    Log.d(
-                                        "MainActivity",
-                                        "병렬 작업 실행 operation result = ${operation.result.get()}"
-                                    )
+                                    Log.d(tag, "병렬 작업 실행 operation = $operation")
+                                    Log.d(tag, "병렬 작업 실행 operation result = ${operation.result.get()}")
                                 }
                             }
                         )
@@ -145,11 +142,8 @@ class LongTimeWorkAndChainingActivity : ComponentActivity() {
                                     val operation =
                                         workManager.beginWith(listOf(request1, request2))
                                             .then(request3).enqueue()
-                                    Log.d("MainActivity", "병렬 작업 실행 operation = $operation")
-                                    Log.d(
-                                        "MainActivity",
-                                        "병렬 작업 실행 operation result = ${operation.result.get()}"
-                                    )
+                                    Log.d(tag, "병렬 작업 실행 operation = $operation")
+                                    Log.d(tag, "병렬 작업 실행 operation result = ${operation.result.get()}")
                                 }
                             }
                         )
@@ -182,14 +176,8 @@ class LongTimeWorkAndChainingActivity : ComponentActivity() {
                                     //MyWorker,DownloadWorker,FinishWorker
                                     val operation = workManager.beginWith(request2).then(request1)
                                         .then(request3).enqueue()
-                                    Log.d(
-                                        "MainActivity",
-                                        "Dependent work 실행 operation = $operation"
-                                    )
-                                    Log.d(
-                                        "MainActivity",
-                                        "Dependent work 실행 operation result = ${operation.await()}"
-                                    )
+                                    Log.d(tag, "Dependent work 실행 operation = $operation")
+                                    Log.d(tag, "Dependent work 실행 operation result = ${operation.await()}")
                                 }
                             }
                         )
