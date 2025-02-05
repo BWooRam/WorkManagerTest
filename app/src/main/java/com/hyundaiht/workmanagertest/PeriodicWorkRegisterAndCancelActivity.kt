@@ -61,7 +61,7 @@ class PeriodicWorkRegisterAndCancelActivity : ComponentActivity() {
                          * 2025-01-03 11:20:42.446  9140-9178  WM-WorkerWrapper        com.hyundaiht.workmanagertest        I  Worker result SUCCESS for Work [ id=fbc66d88-5fc9-4513-8f64-c73b24b3d3c6, tags={ com.hyundaiht.workmanagertest.MainActivity$MyWorker1, MyWorker1 } ]
                          */
                         TitleAndButton(
-                            title = "주기적 작업 예약 테스트",
+                            title = "PeriodicWork enqueue 작업 예약 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
@@ -73,14 +73,17 @@ class PeriodicWorkRegisterAndCancelActivity : ComponentActivity() {
                                     val request = PeriodicWorkRequestBuilder<MyWorker1>(
                                         repeatInterval = 15,
                                         repeatIntervalTimeUnit = TimeUnit.MINUTES
-                                    ).addTag("MyWorker1").build()
+                                    )
+                                        .addTag("PeriodicWorkTest")
+                                        .setInputData(workDataOf("isSuccess" to true))
+                                        .build()
 
                                     workManager.enqueue(request)
                                 }
                             }
                         )
 
-                        TitleAndButton(title = "PeriodicWork enqueue 작업 예약 테스트",
+                        TitleAndButton(title = "PeriodicWork enqueue flex 작업 예약 테스트",
                             titleModifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
