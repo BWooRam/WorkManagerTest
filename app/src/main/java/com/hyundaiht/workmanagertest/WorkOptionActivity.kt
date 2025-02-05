@@ -58,7 +58,7 @@ class WorkOptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 10.dp),
-                            buttonName = "다운로드 실행",
+                            buttonName = "실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
@@ -85,7 +85,7 @@ class WorkOptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 10.dp),
-                            buttonName = "다운로드 실행",
+                            buttonName = "실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
@@ -103,7 +103,7 @@ class WorkOptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 10.dp),
-                            buttonName = "다운로드 실행",
+                            buttonName = "실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
@@ -122,7 +122,7 @@ class WorkOptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 10.dp),
-                            buttonName = "다운로드 실행",
+                            buttonName = "실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
@@ -151,7 +151,7 @@ class WorkOptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 10.dp),
-                            buttonName = "다운로드 실행",
+                            buttonName = "실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
@@ -172,7 +172,7 @@ class WorkOptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 10.dp),
-                            buttonName = "다운로드 실행",
+                            buttonName = "실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
@@ -206,7 +206,7 @@ class WorkOptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 10.dp),
-                            buttonName = "다운로드 실행",
+                            buttonName = "실행",
                             buttonModifier = Modifier.wrapContentSize(),
                             clickEvent = {
                                 CoroutineScope(Dispatchers.Default).launch {
